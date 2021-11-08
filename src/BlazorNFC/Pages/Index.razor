@@ -1,0 +1,29 @@
+﻿@page "/"
+
+<button @onclick="ReadNFC" class="btn btn-primary">Read NFC</button>
+<p><span>@MessageLog</span></p>
+<p><span>@MessageNFC</span></p>
+
+@code {
+	[Inject] IJSRuntime JSRuntime { get; set; }
+
+	private string MessageLog { get; set; }
+	private string MessageNFC { get; set; }
+	private DotNetObjectReference<Index> objRef { get; set; }
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		base.OnAfterRender(firstRender);
+	}
+
+	public async Task ReadNFC(){
+		objRef = DotNetObjectReference.Create(this);
+		MessageLog = await JSRuntime.InvokeAsync<string>("ReadNFC", objRef);
+	}
+
+	[JSInvokable("OnNFCRead")]
+	public void OnNFCRead(string message){
+		MessageNFC = message;
+		StateHasChanged();
+	}
+}
