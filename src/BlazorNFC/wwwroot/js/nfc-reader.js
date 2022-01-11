@@ -1,33 +1,18 @@
 
-function ReadNFC(DoNetReference) {
+function ReadNFC(DotNetReference) {
     if ('NDEFReader' in window) { /* Scan and write NFC tags */
         const ndef = new NDEFReader();
         ndef.scan().then(() => {
             console.log("Scan started successfully.");
-            DoNetReference.invokeMethodAsync('OnNFCRead', "Scan started successfully.");
+            DotNetReference.invokeMethodAsync('OnNFCRead', "Scan started successfully.");
             ndef.onreadingerror = () => {
                 console.log("Cannot read data from the NFC tag. Try another one?");
-                DoNetReference.invokeMethodAsync('OnNFCRead', "Cannot read data from the NFC tag. Try another one?");
+                DotNetReference.invokeMethodAsync('OnNFCRead', "Cannot read data from the NFC tag. Try another one?");
             };
             ndef.onreading = (event) => {
-                const message = event.message;
-                DoNetReference.invokeMethodAsync('OnNFCRead', JSON.stringify(event));
+                console.log(event);
+                DotNetReference.invokeMethodAsync('OnNFCRead', event.serialNumber);
 
-                for (const record of message.records) {
-                    console.log("Record type:  " + record.recordType);
-                    console.log("MIME type:    " + record.mediaType);
-                    console.log("Record id:    " + record.id);
-                    switch (record.recordType) {
-                        case "text":
-                            // TODO: Read text record with record data, lang, and encoding.
-                            break;
-                        case "url":
-                            // TODO: Read URL record with record data.
-                            break;
-                        default:
-                        // TODO: Handle other records with record data.
-                    }
-                }
             };
         }).catch(error => {
             console.log(`Error! Scan failed to start: ${error}.`);
